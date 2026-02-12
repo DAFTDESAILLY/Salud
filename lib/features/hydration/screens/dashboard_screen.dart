@@ -9,6 +9,9 @@ import 'package:agua/features/hydration/models/hydration_log.dart';
 import 'package:agua/features/hydration/screens/history_screen.dart';
 import 'package:agua/features/hydration/screens/settings_screen.dart';
 
+import 'package:agua/features/hydration/widgets/beverage_selection_sheet.dart';
+import 'package:agua/features/hydration/widgets/size_selection_sheet.dart';
+
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -18,70 +21,74 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // Logic for adding water with custom amount
-  void _showAddWaterDialog(BuildContext context, WidgetRef ref) {
-    final TextEditingController controller = TextEditingController();
-    showDialog(
+  void _showSmartEntry(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Agregar Agua'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Cantidad ml',
-            suffixText: 'ml',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final amount = int.tryParse(controller.text);
-              if (amount != null && amount > 0) {
-                _addWater(ref, amount);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Agregar'),
-          ),
-        ],
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => BeverageSelectionSheet(
+        onSelected: (type, coeff) {
+          Navigator.pop(context); // Close beverage sheet
+          _showSizeSelector(context, type, coeff);
+        },
       ),
     );
   }
 
-  Future<void> _addWater(WidgetRef ref, int amount) async {
+  void _showSizeSelector(BuildContext context, String type, double coeff) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SizeSelectionSheet(
+        beverageType: type,
+        onConfirmed: (amount) {
+          Navigator.pop(context); // Close size sheet
+          _addLog(ref, amount, type, coeff);
+        },
+      ),
+    );
+  }
+
+  Future<void> _addLog(
+      WidgetRef ref, int amount, String type, double coeff) async {
+    final effective = (amount * coeff).toInt();
     final isar = await ref.read(isarProvider.future);
+
     final log = HydrationLog()
       ..amountMl = amount
+      ..effectiveAmountMl = effective
+      ..beverageType = type
       ..timestamp = DateTime.now();
 
     await isar.writeTxn(() async {
       await isar.hydrationLogs.put(log);
     });
 
-    // Need to trigger provider refresh if they are streams?
-    // StreamProviders update automatically when Isar fires change events.
-    // HydrationScheduler logic:
     final profile = await ref.read(userProfileProvider.future);
     if (profile != null) {
       final calculator = HydrationCalculatorService();
       final goal = calculator.calculateDailyGoal(profile);
 
-      // Wait a tiny bit for Riverpod to re-calc intake or calculate manually?
       // Best to calculate manually for instant feedback in scheduler
-      final currentTotal = ref.read(todayTotalIntakeProvider);
-      // Note: this provider might be stale.
-      // But passing old + new is fine.
+      // We need to fetch the accumulated effective amount for today.
+      // Since the provider might be async stream, let's calc manually or use current value + new effective.
+      final currentTotal = ref.read(
+          todayTotalIntakeProvider); // This is likely stale or Stream based.
 
-      final scheduler = ref.read(hydrationSchedulerProvider);
-      await scheduler.scheduleDailyReminders(
-          profile, goal, (currentTotal + amount).toInt());
+      // Let's assume currentTotal is up to date enough OR we just add our local effective to it.
+      // Actually ref.read(provider) on a StreamProvider returns AsyncValue.
+      // But I defined todayTotalIntakeProvider as a Provider<double> which watches a StreamProvider.
+      // So reading it gives the *last emitted value*.
+
+      await ref.read(hydrationSchedulerProvider).scheduleDailyReminders(
+          profile, goal, (currentTotal + effective).toInt());
     }
+  }
+
+  // Quick add (default water)
+  Future<void> _addWater(WidgetRef ref, int amount) async {
+    await _addLog(ref, amount, 'water', 1.0);
   }
 
   @override
@@ -210,7 +217,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         height: 64,
         width: 64,
         child: FloatingActionButton(
-          onPressed: () => _showAddWaterDialog(context, ref),
+          onPressed: () => _showSmartEntry(context),
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: Colors.white,
           elevation: 4,

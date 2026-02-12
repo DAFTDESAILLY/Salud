@@ -78,7 +78,8 @@ final todayLogsProvider = StreamProvider<List<HydrationLog>>((ref) async* {
 final todayTotalIntakeProvider = Provider<double>((ref) {
   final logsAsync = ref.watch(todayLogsProvider);
   return logsAsync.when(
-    data: (logs) => logs.fold(0, (sum, log) => sum + log.amountMl),
+    data: (logs) => logs.fold(
+        0, (sum, log) => sum + (log.effectiveAmountMl ?? log.amountMl)),
     loading: () => 0,
     error: (_, __) => 0,
   );
@@ -142,7 +143,8 @@ final weeklyHistoryProvider =
             .isAfter(startOfDay.subtract(const Duration(milliseconds: 1))) &&
         l.timestamp.isBefore(endOfDay));
 
-    final totalIntake = dailyLogs.fold(0, (sum, log) => sum + log.amountMl);
+    final totalIntake = dailyLogs.fold(
+        0, (sum, log) => sum + (log.effectiveAmountMl ?? log.amountMl));
 
     history.add(DailyHistoryData(
       date: date,
@@ -176,7 +178,8 @@ final streakProvider = FutureProvider<int>((ref) async {
       .filter()
       .timestampBetween(todayMidnight, today.add(const Duration(days: 1)))
       .findAll();
-  final todayIntake = todayLogs.fold(0, (sum, log) => sum + log.amountMl);
+  final todayIntake = todayLogs.fold(
+      0, (sum, log) => sum + (log.effectiveAmountMl ?? log.amountMl));
 
   if (todayIntake >= target) {
     streak++;
@@ -204,7 +207,8 @@ final streakProvider = FutureProvider<int>((ref) async {
         .filter()
         .timestampBetween(checkDate, checkDate.add(const Duration(days: 1)))
         .findAll();
-    final dayIntake = dayIntakeLogs.fold(0, (sum, log) => sum + log.amountMl);
+    final dayIntake = dayIntakeLogs.fold(
+        0, (sum, log) => sum + (log.effectiveAmountMl ?? log.amountMl));
 
     if (dayIntake >= goal.targetAmountMl) {
       streak++;
