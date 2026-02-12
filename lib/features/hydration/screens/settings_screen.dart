@@ -89,53 +89,143 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             return const Center(child: Text('Perfil no encontrado'));
           return ListView(
             children: [
-              _buildSectionHeader('Mi Perfil'),
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: Text(
-                    profile.name.isNotEmpty
-                        ? profile.name[0].toUpperCase()
-                        : 'U',
-                    style: TextStyle(
-                        color:
-                            Theme.of(context).colorScheme.onPrimaryContainer),
-                  ),
-                ),
-                title: Text(profile.name.isNotEmpty ? profile.name : 'Usuario'),
-                subtitle: Text(
-                    '${profile.age} años • ${profile.weight} kg • ${profile.sex == 'male' ? 'H' : 'M'}'),
-                trailing: const Icon(Icons.edit_outlined),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfileScreen(profile: profile),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionHeader('Mi Perfil'),
+                    Card(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          child: Text(
+                            profile.name.isNotEmpty
+                                ? profile.name[0].toUpperCase()
+                                : 'U',
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer),
+                          ),
+                        ),
+                        title: Text(
+                          profile.name.isNotEmpty ? profile.name : 'Usuario',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                              '${profile.age} años • ${profile.weight} kg • ${profile.sex == 'male' ? 'H' : 'M'}'),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surfaceVariant,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.edit_outlined),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditProfileScreen(profile: profile),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
-              _buildSectionHeader('Horarios y Recordatorios'),
-              ListTile(
-                leading: const Icon(Icons.wb_sunny_outlined),
-                title: const Text('Hora de despertar'),
-                subtitle:
-                    Text(_formatTime(profile.wakeUpHour, profile.wakeUpMinute)),
-                onTap: () => _updateTime(profile, true),
-              ),
-              ListTile(
-                leading: const Icon(Icons.bedtime_outlined),
-                title: const Text('Hora de dormir'),
-                subtitle: Text(
-                    _formatTime(profile.bedTimeHour, profile.bedTimeMinute)),
-                onTap: () => _updateTime(profile, false),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Los recordatorios se enviarán cada hora entre tu hora de despertar y dormir, ayudándote a alcanzar tu meta diaria.',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                    const SizedBox(height: 16),
+                    _buildSectionHeader('Horarios y Recordatorios'),
+                    Card(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.wb_sunny_rounded,
+                                  color: Colors.orange),
+                            ),
+                            title: const Text('Hora de despertar'),
+                            subtitle: Text(_formatTime(
+                                profile.wakeUpHour, profile.wakeUpMinute)),
+                            trailing: const Icon(Icons.chevron_right_rounded),
+                            onTap: () => _updateTime(profile, true),
+                          ),
+                          Divider(
+                              height: 1,
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.1)),
+                          ListTile(
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.bedtime_rounded,
+                                  color: Colors.indigo),
+                            ),
+                            title: const Text('Hora de dormir'),
+                            subtitle: Text(_formatTime(
+                                profile.bedTimeHour, profile.bedTimeMinute)),
+                            trailing: const Icon(Icons.chevron_right_rounded),
+                            onTap: () => _updateTime(profile, false),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer
+                            .withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer
+                                .withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded,
+                              color: Theme.of(context).colorScheme.secondary,
+                              size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Los recordatorios se ajustan automáticamente a tu horario de sueño.',
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.color,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
             ],

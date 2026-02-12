@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:agua/features/hydration/providers/hydration_providers.dart';
 import 'package:agua/features/hydration/models/daily_history_data.dart';
+import 'package:agua/features/hydration/widgets/weekly_bar_chart.dart';
+import 'package:agua/features/hydration/widgets/summary_metrics.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -21,90 +23,97 @@ class HistoryScreen extends ConsumerWidget {
           if (history.isEmpty) {
             return const Center(child: Text('No hay datos disponibles.'));
           }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: history.length,
-            itemBuilder: (context, index) {
-              final dayData = history[index];
-              final isToday = DateUtils.isSameDay(dayData.date, DateTime.now());
+          // Reverse history for list (newest first), but Charts might want chronological?
+          // The weeklyHistoryProvider returns reversed (newest first).
+          // Charts usually go Left->Right (Oldest->Newest).
+          // So let's reverse it back for the chart.
+          final chronologicalHistory = history.reversed.toList();
 
-              return Card(
-                elevation: 0,
-                color: isToday
-                    ? colorScheme.primaryContainer.withOpacity(0.3)
-                    : colorScheme.surfaceVariant.withOpacity(0.3),
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            DateFormat('EEEE d, MMM', 'es')
-                                .format(dayData.date),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: colorScheme.onSurface,
-                            ),
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.all(16.0),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    WeeklyBarChart(history: chronologicalHistory),
+                    const SizedBox(height: 16),
+                    SummaryMetrics(
+                        history: history), // Order doesn't matter for summary
+                    const SizedBox(height: 24),
+                    Text(
+                      'Detalle',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                          if (isToday)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: colorScheme.primary,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'Hoy',
-                                style: TextStyle(
-                                  color: colorScheme.onPrimary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: LinearProgressIndicator(
-                                value: dayData.progress,
-                                minHeight: 12,
-                                backgroundColor: Colors.white,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  dayData.progress >= 1.0
+                    ),
+                    const SizedBox(height: 8),
+                  ]),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final dayData = history[index];
+                      final isToday =
+                          DateUtils.isSameDay(dayData.date, DateTime.now());
+
+                      return Card(
+                        elevation: 0,
+                        color: isToday
+                            ? colorScheme.primaryContainer.withOpacity(0.3)
+                            : colorScheme.surfaceVariant.withOpacity(0.3),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: dayData.intakeMl >= dayData.goalMl
                                       ? Colors.green
-                                      : const Color(0xFF6FA6E0),
+                                      : Colors.grey,
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
-                            ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      DateFormat('EEEE d, MMM', 'es')
+                                          .format(dayData.date),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      '${dayData.intakeMl} / ${dayData.goalMl} ml',
+                                      style: TextStyle(
+                                          color: colorScheme.onSurfaceVariant),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (dayData.intakeMl >= dayData.goalMl)
+                                const Icon(Icons.check_circle,
+                                    color: Colors.green),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${dayData.intakeMl} / ${dayData.goalMl} ml',
-                            style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      );
+                    },
+                    childCount: history.length,
                   ),
                 ),
-              );
-            },
+              ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+            ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),

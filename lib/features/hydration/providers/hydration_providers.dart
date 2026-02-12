@@ -155,3 +155,64 @@ final weeklyHistoryProvider =
   // Lists usually show newest at top.
   return history.reversed.toList();
 });
+
+final streakProvider = FutureProvider<int>((ref) async {
+  final isar = await ref.watch(isarProvider.future);
+  final today = DateTime.now();
+  final todayMidnight = DateTime(today.year, today.month, today.day);
+
+  int streak = 0;
+
+  // Check Today first
+  // Calculate today's intake and goal
+  // We can reuse providers but async inside async is tricky, better direct query for speed/consistency in this block
+  final dailyGoal = await isar.dailyHydrationGoals
+      .filter()
+      .dateEqualTo(todayMidnight)
+      .findFirst();
+  final target = dailyGoal?.targetAmountMl ?? 2000; // Fallback
+
+  final todayLogs = await isar.hydrationLogs
+      .filter()
+      .timestampBetween(todayMidnight, today.add(const Duration(days: 1)))
+      .findAll();
+  final todayIntake = todayLogs.fold(0, (sum, log) => sum + log.amountMl);
+
+  if (todayIntake >= target) {
+    streak++;
+  }
+
+  // Check backwards from yesterday
+  DateTime checkDate = todayMidnight.subtract(const Duration(days: 1));
+
+  while (true) {
+    final goal = await isar.dailyHydrationGoals
+        .filter()
+        .dateEqualTo(checkDate)
+        .findFirst();
+    // If no goal recorded for that day, maybe we assume default or 0?
+    // If user wasn't active, maybe break?
+    // Let's assume if no goal exists, streak breaks OR we check valid days.
+    // Simple logic: if no goal data, break.
+    // OR: use profile current goal if missing? No, historical accuracy.
+    if (goal == null) {
+      // If we go back far enough to before app install, we break.
+      break;
+    }
+
+    final dayIntakeLogs = await isar.hydrationLogs
+        .filter()
+        .timestampBetween(checkDate, checkDate.add(const Duration(days: 1)))
+        .findAll();
+    final dayIntake = dayIntakeLogs.fold(0, (sum, log) => sum + log.amountMl);
+
+    if (dayIntake >= goal.targetAmountMl) {
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+});

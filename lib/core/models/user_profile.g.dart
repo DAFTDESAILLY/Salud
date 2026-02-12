@@ -28,33 +28,58 @@ const UserProfileSchema = CollectionSchema(
       name: r'age',
       type: IsarType.long,
     ),
-    r'createdAt': PropertySchema(
+    r'bedTimeHour': PropertySchema(
       id: 2,
+      name: r'bedTimeHour',
+      type: IsarType.long,
+    ),
+    r'bedTimeMinute': PropertySchema(
+      id: 3,
+      name: r'bedTimeMinute',
+      type: IsarType.long,
+    ),
+    r'createdAt': PropertySchema(
+      id: 4,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'exerciseHours': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'exerciseHours',
       type: IsarType.double,
     ),
+    r'name': PropertySchema(
+      id: 6,
+      name: r'name',
+      type: IsarType.string,
+    ),
     r'sex': PropertySchema(
-      id: 4,
+      id: 7,
       name: r'sex',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 5,
+      id: 8,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'usesCreatine': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'usesCreatine',
       type: IsarType.bool,
     ),
+    r'wakeUpHour': PropertySchema(
+      id: 10,
+      name: r'wakeUpHour',
+      type: IsarType.long,
+    ),
+    r'wakeUpMinute': PropertySchema(
+      id: 11,
+      name: r'wakeUpMinute',
+      type: IsarType.long,
+    ),
     r'weight': PropertySchema(
-      id: 7,
+      id: 12,
       name: r'weight',
       type: IsarType.double,
     )
@@ -79,6 +104,7 @@ int _userProfileEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.sex.length * 3;
   return bytesCount;
 }
@@ -91,12 +117,17 @@ void _userProfileSerialize(
 ) {
   writer.writeByte(offsets[0], object.activityLevel.index);
   writer.writeLong(offsets[1], object.age);
-  writer.writeDateTime(offsets[2], object.createdAt);
-  writer.writeDouble(offsets[3], object.exerciseHours);
-  writer.writeString(offsets[4], object.sex);
-  writer.writeDateTime(offsets[5], object.updatedAt);
-  writer.writeBool(offsets[6], object.usesCreatine);
-  writer.writeDouble(offsets[7], object.weight);
+  writer.writeLong(offsets[2], object.bedTimeHour);
+  writer.writeLong(offsets[3], object.bedTimeMinute);
+  writer.writeDateTime(offsets[4], object.createdAt);
+  writer.writeDouble(offsets[5], object.exerciseHours);
+  writer.writeString(offsets[6], object.name);
+  writer.writeString(offsets[7], object.sex);
+  writer.writeDateTime(offsets[8], object.updatedAt);
+  writer.writeBool(offsets[9], object.usesCreatine);
+  writer.writeLong(offsets[10], object.wakeUpHour);
+  writer.writeLong(offsets[11], object.wakeUpMinute);
+  writer.writeDouble(offsets[12], object.weight);
 }
 
 UserProfile _userProfileDeserialize(
@@ -110,13 +141,18 @@ UserProfile _userProfileDeserialize(
           reader.readByteOrNull(offsets[0])] ??
       ActivityLevel.sedentary;
   object.age = reader.readLong(offsets[1]);
-  object.createdAt = reader.readDateTime(offsets[2]);
-  object.exerciseHours = reader.readDouble(offsets[3]);
+  object.bedTimeHour = reader.readLong(offsets[2]);
+  object.bedTimeMinute = reader.readLong(offsets[3]);
+  object.createdAt = reader.readDateTime(offsets[4]);
+  object.exerciseHours = reader.readDouble(offsets[5]);
   object.id = id;
-  object.sex = reader.readString(offsets[4]);
-  object.updatedAt = reader.readDateTime(offsets[5]);
-  object.usesCreatine = reader.readBool(offsets[6]);
-  object.weight = reader.readDouble(offsets[7]);
+  object.name = reader.readString(offsets[6]);
+  object.sex = reader.readString(offsets[7]);
+  object.updatedAt = reader.readDateTime(offsets[8]);
+  object.usesCreatine = reader.readBool(offsets[9]);
+  object.wakeUpHour = reader.readLong(offsets[10]);
+  object.wakeUpMinute = reader.readLong(offsets[11]);
+  object.weight = reader.readDouble(offsets[12]);
   return object;
 }
 
@@ -134,16 +170,26 @@ P _userProfileDeserializeProp<P>(
     case 1:
       return (reader.readLong(offset)) as P;
     case 2:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 3:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
-    case 5:
       return (reader.readDateTime(offset)) as P;
+    case 5:
+      return (reader.readDouble(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
+      return (reader.readDateTime(offset)) as P;
+    case 9:
+      return (reader.readBool(offset)) as P;
+    case 10:
+      return (reader.readLong(offset)) as P;
+    case 11:
+      return (reader.readLong(offset)) as P;
+    case 12:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -364,6 +410,118 @@ extension UserProfileQueryFilter
   }
 
   QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeHourEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'bedTimeHour',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeHourGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'bedTimeHour',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeHourLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'bedTimeHour',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeHourBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'bedTimeHour',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeMinuteEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'bedTimeMinute',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeMinuteGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'bedTimeMinute',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeMinuteLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'bedTimeMinute',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      bedTimeMinuteBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'bedTimeMinute',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
       createdAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -534,6 +692,137 @@ extension UserProfileQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'name',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'name',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> nameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      nameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'name',
+        value: '',
       ));
     });
   }
@@ -735,6 +1024,118 @@ extension UserProfileQueryFilter
     });
   }
 
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpHourEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'wakeUpHour',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpHourGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'wakeUpHour',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpHourLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'wakeUpHour',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpHourBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'wakeUpHour',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpMinuteEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'wakeUpMinute',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpMinuteGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'wakeUpMinute',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpMinuteLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'wakeUpMinute',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+      wakeUpMinuteBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'wakeUpMinute',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> weightEqualTo(
     double value, {
     double epsilon = Query.epsilon,
@@ -832,6 +1233,31 @@ extension UserProfileQuerySortBy
     });
   }
 
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByBedTimeHour() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeHour', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByBedTimeHourDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeHour', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByBedTimeMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeMinute', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy>
+      sortByBedTimeMinuteDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeMinute', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -854,6 +1280,18 @@ extension UserProfileQuerySortBy
       sortByExerciseHoursDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'exerciseHours', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.desc);
     });
   }
 
@@ -891,6 +1329,31 @@ extension UserProfileQuerySortBy
       sortByUsesCreatineDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'usesCreatine', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByWakeUpHour() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpHour', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByWakeUpHourDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpHour', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByWakeUpMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpMinute', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy>
+      sortByWakeUpMinuteDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpMinute', Sort.desc);
     });
   }
 
@@ -934,6 +1397,31 @@ extension UserProfileQuerySortThenBy
     });
   }
 
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByBedTimeHour() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeHour', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByBedTimeHourDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeHour', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByBedTimeMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeMinute', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy>
+      thenByBedTimeMinuteDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bedTimeMinute', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -968,6 +1456,18 @@ extension UserProfileQuerySortThenBy
   QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.desc);
     });
   }
 
@@ -1008,6 +1508,31 @@ extension UserProfileQuerySortThenBy
     });
   }
 
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByWakeUpHour() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpHour', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByWakeUpHourDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpHour', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByWakeUpMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpMinute', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy>
+      thenByWakeUpMinuteDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wakeUpMinute', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByWeight() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'weight', Sort.asc);
@@ -1035,6 +1560,18 @@ extension UserProfileQueryWhereDistinct
     });
   }
 
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByBedTimeHour() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'bedTimeHour');
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByBedTimeMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'bedTimeMinute');
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -1044,6 +1581,13 @@ extension UserProfileQueryWhereDistinct
   QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByExerciseHours() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'exerciseHours');
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByName(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
     });
   }
 
@@ -1063,6 +1607,18 @@ extension UserProfileQueryWhereDistinct
   QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByUsesCreatine() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'usesCreatine');
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByWakeUpHour() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'wakeUpHour');
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByWakeUpMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'wakeUpMinute');
     });
   }
 
@@ -1094,6 +1650,18 @@ extension UserProfileQueryProperty
     });
   }
 
+  QueryBuilder<UserProfile, int, QQueryOperations> bedTimeHourProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'bedTimeHour');
+    });
+  }
+
+  QueryBuilder<UserProfile, int, QQueryOperations> bedTimeMinuteProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'bedTimeMinute');
+    });
+  }
+
   QueryBuilder<UserProfile, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
@@ -1103,6 +1671,12 @@ extension UserProfileQueryProperty
   QueryBuilder<UserProfile, double, QQueryOperations> exerciseHoursProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'exerciseHours');
+    });
+  }
+
+  QueryBuilder<UserProfile, String, QQueryOperations> nameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'name');
     });
   }
 
@@ -1121,6 +1695,18 @@ extension UserProfileQueryProperty
   QueryBuilder<UserProfile, bool, QQueryOperations> usesCreatineProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'usesCreatine');
+    });
+  }
+
+  QueryBuilder<UserProfile, int, QQueryOperations> wakeUpHourProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'wakeUpHour');
+    });
+  }
+
+  QueryBuilder<UserProfile, int, QQueryOperations> wakeUpMinuteProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'wakeUpMinute');
     });
   }
 

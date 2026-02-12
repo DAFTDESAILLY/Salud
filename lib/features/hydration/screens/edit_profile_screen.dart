@@ -18,6 +18,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  late String _name;
   late int _age;
   late String _sex;
   late double _weight;
@@ -28,6 +29,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _name = widget.profile.name;
     _age = widget.profile.age;
     _sex = widget.profile.sex;
     _weight = widget.profile.weight;
@@ -42,6 +44,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       // Update local profile object
       final updatedProfile = widget.profile
+        ..name = _name
         ..age = _age
         ..sex = _sex
         ..weight = _weight
@@ -61,11 +64,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         await isar.userProfiles.put(updatedProfile);
 
         // Update Today's Goal
-        // We find today's goal and update it, or create if missing.
         final today = DateTime.now();
         final todayMidnight = DateTime(today.year, today.month, today.day);
 
-        // Try to find existing goal for today
         final existingGoal = await isar.dailyHydrationGoals
             .filter()
             .dateEqualTo(todayMidnight)
@@ -101,92 +102,162 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Datos Físicos')),
+      appBar: AppBar(title: const Text('Editar Perfil')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                initialValue: _age.toString(),
-                decoration: const InputDecoration(
-                    labelText: 'Edad (años)', border: OutlineInputBorder()),
-                keyboardType: TextInputType.number,
-                validator: (v) =>
-                    (v == null || int.tryParse(v) == null) ? 'Inválido' : null,
-                onSaved: (v) => _age = int.parse(v!),
+              _buildSectionTitle('Información Personal'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        initialValue: _name,
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.person_outline),
+                        ),
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Ingresa tu nombre'
+                            : null,
+                        onSaved: (v) => _name = v ?? 'Usuario',
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              initialValue: _age.toString(),
+                              decoration: const InputDecoration(
+                                  labelText: 'Edad',
+                                  border: OutlineInputBorder()),
+                              keyboardType: TextInputType.number,
+                              validator: (v) =>
+                                  (v == null || int.tryParse(v) == null)
+                                      ? 'Inválido'
+                                      : null,
+                              onSaved: (v) => _age = int.parse(v!),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: _sex,
+                              decoration: const InputDecoration(
+                                  labelText: 'Sexo',
+                                  border: OutlineInputBorder()),
+                              items: const [
+                                DropdownMenuItem(
+                                    value: 'male', child: Text('Masculino')),
+                                DropdownMenuItem(
+                                    value: 'female', child: Text('Femenino')),
+                              ],
+                              onChanged: (v) => setState(() => _sex = v!),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _sex,
-                decoration: const InputDecoration(
-                    labelText: 'Sexo', border: OutlineInputBorder()),
-                items: const [
-                  DropdownMenuItem(value: 'male', child: Text('Masculino')),
-                  DropdownMenuItem(value: 'female', child: Text('Femenino')),
-                ],
-                onChanged: (v) => setState(() => _sex = v!),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: _weight.toString(),
-                decoration: const InputDecoration(
-                    labelText: 'Peso (kg)', border: OutlineInputBorder()),
-                keyboardType: TextInputType.number,
-                validator: (v) => (v == null || double.tryParse(v) == null)
-                    ? 'Inválido'
-                    : null,
-                onSaved: (v) => _weight = double.parse(v!),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<ActivityLevel>(
-                value: _activityLevel,
-                decoration: const InputDecoration(
-                    labelText: 'Nivel de Actividad',
-                    border: OutlineInputBorder()),
-                items: const [
-                  DropdownMenuItem(
-                      value: ActivityLevel.sedentary,
-                      child: Text('Sedentario')),
-                  DropdownMenuItem(
-                      value: ActivityLevel.moderate, child: Text('Moderado')),
-                  DropdownMenuItem(
-                      value: ActivityLevel.high, child: Text('Alto')),
-                ],
-                onChanged: (v) => setState(() => _activityLevel = v!),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: _exerciseHours.toString(),
-                decoration: const InputDecoration(
-                    labelText: 'Horas Ejercicio (día)',
-                    border: OutlineInputBorder()),
-                keyboardType: TextInputType.number,
-                validator: (v) => (v == null || double.tryParse(v) == null)
-                    ? 'Inválido'
-                    : null,
-                onSaved: (v) => _exerciseHours = double.parse(v!),
-              ),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                title: const Text('¿Usas Creatina?'),
-                value: _usesCreatine,
-                onChanged: (v) => setState(() => _usesCreatine = v),
+              const SizedBox(height: 24),
+              _buildSectionTitle('Datos Físicos & Actividad'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        initialValue: _weight.toString(),
+                        decoration: const InputDecoration(
+                            labelText: 'Peso (kg)',
+                            border: OutlineInputBorder()),
+                        keyboardType: TextInputType.number,
+                        validator: (v) =>
+                            (v == null || double.tryParse(v) == null)
+                                ? 'Inválido'
+                                : null,
+                        onSaved: (v) => _weight = double.parse(v!),
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<ActivityLevel>(
+                        value: _activityLevel,
+                        decoration: const InputDecoration(
+                            labelText: 'Nivel de Actividad',
+                            border: OutlineInputBorder()),
+                        items: const [
+                          DropdownMenuItem(
+                              value: ActivityLevel.sedentary,
+                              child: Text('Sedentario')),
+                          DropdownMenuItem(
+                              value: ActivityLevel.moderate,
+                              child: Text('Moderado')),
+                          DropdownMenuItem(
+                              value: ActivityLevel.high, child: Text('Alto')),
+                        ],
+                        onChanged: (v) => setState(() => _activityLevel = v!),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        initialValue: _exerciseHours.toString(),
+                        decoration: const InputDecoration(
+                            labelText: 'Horas Ejercicio (día)',
+                            border: OutlineInputBorder()),
+                        keyboardType: TextInputType.number,
+                        validator: (v) =>
+                            (v == null || double.tryParse(v) == null)
+                                ? 'Inválido'
+                                : null,
+                        onSaved: (v) => _exerciseHours = double.parse(v!),
+                      ),
+                      const SizedBox(height: 16),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('¿Usas Creatina?'),
+                        value: _usesCreatine,
+                        activeColor: Theme.of(context).colorScheme.primary,
+                        onChanged: (v) => setState(() => _usesCreatine = v),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                child: FilledButton(
+                child: FilledButton.icon(
                   onPressed: _saveChanges,
-                  child: const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text('Guardar Cambios'),
+                  icon: const Icon(Icons.save_rounded),
+                  label: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text('Guardar y Recalcular Meta'),
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
     );

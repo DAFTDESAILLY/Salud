@@ -6,6 +6,7 @@ import 'package:agua/features/notifications/services/notification_service.dart';
 import 'package:agua/features/hydration/providers/hydration_providers.dart';
 import 'package:agua/features/hydration/screens/onboarding_screen.dart';
 import 'package:agua/features/hydration/screens/dashboard_screen.dart';
+import 'package:agua/core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,7 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       title: 'Agua',
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -43,10 +45,9 @@ class MyApp extends ConsumerWidget {
       supportedLocales: const [
         Locale('es'),
       ],
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6FA6E0)),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.dark, // Enforce dark mode as per requirements
       home: profileAsync.when(
         data: (profile) {
           // If profile exists, go to Dashboard. Else, Onboarding.
