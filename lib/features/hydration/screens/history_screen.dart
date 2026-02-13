@@ -74,7 +74,7 @@ class HistoryScreen extends ConsumerWidget {
                               color: isToday
                                   ? colorScheme.primaryContainer
                                       .withOpacity(0.3)
-                                  : colorScheme.surfaceVariant.withOpacity(0.3),
+                                  : colorScheme.surfaceContainerHighest.withOpacity(0.3),
                               margin: const EdgeInsets.only(bottom: 12),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16)),

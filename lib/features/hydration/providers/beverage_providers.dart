@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
-import 'package:agua/core/database/isar_service.dart';
 import 'package:agua/features/hydration/models/beverage_config.dart';
 import 'package:agua/features/hydration/providers/hydration_providers.dart';
 

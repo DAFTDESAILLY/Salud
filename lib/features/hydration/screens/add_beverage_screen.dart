@@ -190,7 +190,7 @@ class _AddBeverageScreenState extends ConsumerState<AddBeverageScreen> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? theme.colorScheme.primaryContainer
-                          : theme.colorScheme.surfaceVariant,
+                          : theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
                       border: isSelected
                           ? Border.all(

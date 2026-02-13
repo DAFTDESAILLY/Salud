@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:agua/core/database/isar_service.dart';
-import 'package:agua/features/notifications/services/notification_service.dart';
-import 'package:agua/features/hydration/providers/hydration_providers.dart';
-import 'package:agua/features/hydration/screens/onboarding_screen.dart';
-import 'package:agua/features/hydration/screens/dashboard_screen.dart';
+import 'package:agua/core/auth/providers/auth_providers.dart';
+import 'package:agua/core/auth/screens/onboarding_screen.dart';
+import 'package:agua/features/dashboard/screens/home_dashboard.dart';
 import 'package:agua/core/theme/app_theme.dart';
+// Note: NotificationService and hydration providers might need update later,
+// keeping them if they resolve, otherwise might comment out until migrated.
+// Actually notification service is in hydration/services/ usually?
+// The file view showed: import 'package:agua/features/notifications/services/notification_service.dart';
+// If that file wasn't moved, it's fine.
+import 'package:agua/features/notifications/services/notification_service.dart';
+// import 'package:agua/features/hydration/providers/hydration_providers.dart'; // Likely conflicting or needs move.
+// We will comment out hydration specific imports until Phase 2 or if we need them for logic.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +42,7 @@ class MyApp extends ConsumerWidget {
     final profileAsync = ref.watch(userProfileProvider);
 
     return MaterialApp(
-      title: 'Agua',
+      title: 'SuperApp Salud',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -47,13 +54,14 @@ class MyApp extends ConsumerWidget {
       ],
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark, // Enforce dark mode as per requirements
+      themeMode: ThemeMode.dark,
       home: profileAsync.when(
         data: (profile) {
-          // If profile exists, go to Dashboard. Else, Onboarding.
-          return profile != null
-              ? const DashboardScreen()
-              : const OnboardingScreen();
+          if (profile != null && profile.hasCompletedOnboarding) {
+            return const HomeDashboard();
+          } else {
+            return const OnboardingScreen();
+          }
         },
         loading: () =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),

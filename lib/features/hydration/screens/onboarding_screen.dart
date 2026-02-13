@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:agua/core/theme/responsive_utils.dart';
 
-import 'package:agua/core/models/user_profile.dart';
+import 'package:agua/core/auth/models/user_profile.dart';
 import '../services/hydration_calculator_service.dart';
 import '../providers/hydration_providers.dart';
 import '../models/daily_hydration_goal.dart';
@@ -98,10 +99,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Responsive padding
+    final horizontalPadding = context.wp(6).clamp(16.0, 48.0);
+    final verticalPadding = context.hp(3).clamp(16.0, 32.0);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Bienvenido')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding, vertical: verticalPadding),
         child: Form(
           key: _formKey,
           child: Column(
@@ -111,7 +117,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 'Configuremos tu perfil de hidratación',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 24),
+              context.vSpace(3),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Nombre',
@@ -124,7 +130,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ? 'Ingresa tu nombre'
                     : null,
               ),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Edad (años)'),
                 keyboardType: TextInputType.number,
@@ -135,7 +141,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ? 'Ingresa una edad válida'
                         : null,
               ),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               DropdownButtonFormField<String>(
                 value: _sex,
                 items: const [
@@ -145,14 +151,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 onChanged: (v) => setState(() => _sex = v!),
                 decoration: const InputDecoration(labelText: 'Sexo'),
               ),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Peso (kg)'),
                 keyboardType: TextInputType.number,
                 initialValue: '70',
                 onSaved: (value) => _weight = double.parse(value!),
               ),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               DropdownButtonFormField<ActivityLevel>(
                 value: _activityLevel,
                 items: const [
@@ -168,7 +174,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 decoration:
                     const InputDecoration(labelText: 'Nivel de Actividad'),
               ),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               TextFormField(
                 decoration:
                     const InputDecoration(labelText: 'Horas Ejercicio (dia)'),
@@ -176,16 +182,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 initialValue: '0',
                 onSaved: (value) => _exerciseHours = double.parse(value!),
               ),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               SwitchListTile(
                 title: const Text('¿Usas Creatina?'),
                 value: _usesCreatine,
                 onChanged: (v) => setState(() => _usesCreatine = v),
               ),
-              const SizedBox(height: 24),
+              context.vSpace(3),
               const Text('Horarios',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
+              context.vSpace(2),
               ListTile(
                 title: const Text('Hora de despertar'),
                 subtitle: Text(_formatTime(_wakeUpTime)),
@@ -195,7 +201,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
-              const SizedBox(height: 12),
+              context.vSpace(1.5),
               ListTile(
                 title: const Text('Hora de dormir'),
                 subtitle: Text(_formatTime(_bedTime)),
@@ -205,13 +211,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
-              const SizedBox(height: 32),
+              context.vSpace(4),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _saveProfile,
-                  child: const Padding(
-                    padding: EdgeInsets.all(16.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Text('Comenzar', style: TextStyle(fontSize: 18)),
                   ),
                 ),

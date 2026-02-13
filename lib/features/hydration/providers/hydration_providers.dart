@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:agua/core/database/isar_service.dart';
-import 'package:agua/core/models/user_profile.dart';
+import 'package:agua/core/auth/models/user_profile.dart';
 import 'package:agua/features/notifications/services/notification_service.dart';
 import 'package:agua/features/notifications/services/hydration_scheduler_service.dart';
 import '../models/daily_hydration_goal.dart';

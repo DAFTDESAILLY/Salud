@@ -1,6 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:agua/core/models/user_profile.dart';
+import 'package:agua/core/auth/models/user_profile.dart';
 import 'package:agua/features/notifications/services/notification_service.dart';
 
 class HydrationSchedulerService {

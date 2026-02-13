@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:agua/core/theme/responsive_utils.dart'; // Import utility
 import 'package:agua/features/hydration/widgets/animated_circular_progress.dart';
 import 'package:agua/features/hydration/widgets/dashboard_widgets.dart';
 import 'package:agua/features/hydration/widgets/quick_add_capsule.dart';
@@ -104,6 +105,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     // Goal Value
     final goal = goalAsync.value ?? 2000;
 
+    // Responsive Sizing
+    // We want the progress circle to take up a significant portion of width, but not too much.
+    // e.g. 70% of width, capped at maybe 320 for tablets? For now simple relative.
+    final progressSize = context.wp(70).clamp(200.0, 350.0);
+    final fontSizeBig = context.wp(14).clamp(40.0, 70.0);
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -148,12 +155,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 20),
+                      SizedBox(height: context.hp(2)),
 
                       // Progress Circle
                       AnimatedCircularProgress(
                         percentage: progress,
-                        size: 280,
+                        size: progressSize,
                         color: theme
                             .colorScheme.primary, // Azul eléctrico from theme
                         child: Column(
@@ -162,7 +169,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             Text(
                               '${(progress * 100).toInt()}%',
                               style: theme.textTheme.displayLarge?.copyWith(
-                                fontSize: 56,
+                                fontSize: fontSizeBig,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -178,7 +185,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: context.hp(4)),
 
                       // Motivation & Streak
                       MotivationText(percentage: progress),
@@ -189,9 +196,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         error: (_, __) => const SizedBox.shrink(),
                       ),
 
-                      const SizedBox(height: 48),
+                      SizedBox(height: context.hp(6)),
 
                       // Quick Add Capsules
+                      // Wrap in FittedBox or Row with flexible spacing if needed
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -206,7 +214,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 40),
+                      // Bottom spacing
+                      SizedBox(height: context.hp(5)),
                     ],
                   ),
                 ),

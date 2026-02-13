@@ -27,23 +27,33 @@ const BeverageConfigSchema = CollectionSchema(
       name: r'colorValue',
       type: IsarType.long,
     ),
-    r'isEnabled': PropertySchema(
+    r'iconCodePoint': PropertySchema(
       id: 2,
+      name: r'iconCodePoint',
+      type: IsarType.long,
+    ),
+    r'isEnabled': PropertySchema(
+      id: 3,
       name: r'isEnabled',
       type: IsarType.bool,
     ),
     r'name': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
+    r'presetSizes': PropertySchema(
+      id: 5,
+      name: r'presetSizes',
+      type: IsarType.longList,
+    ),
     r'type': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'type',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -83,6 +93,12 @@ int _beverageConfigEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.name.length * 3;
+  {
+    final value = object.presetSizes;
+    if (value != null) {
+      bytesCount += 3 + value.length * 8;
+    }
+  }
   bytesCount += 3 + object.type.length * 3;
   return bytesCount;
 }
@@ -95,10 +111,12 @@ void _beverageConfigSerialize(
 ) {
   writer.writeDouble(offsets[0], object.coefficient);
   writer.writeLong(offsets[1], object.colorValue);
-  writer.writeBool(offsets[2], object.isEnabled);
-  writer.writeString(offsets[3], object.name);
-  writer.writeString(offsets[4], object.type);
-  writer.writeDateTime(offsets[5], object.updatedAt);
+  writer.writeLong(offsets[2], object.iconCodePoint);
+  writer.writeBool(offsets[3], object.isEnabled);
+  writer.writeString(offsets[4], object.name);
+  writer.writeLongList(offsets[5], object.presetSizes);
+  writer.writeString(offsets[6], object.type);
+  writer.writeDateTime(offsets[7], object.updatedAt);
 }
 
 BeverageConfig _beverageConfigDeserialize(
@@ -110,11 +128,13 @@ BeverageConfig _beverageConfigDeserialize(
   final object = BeverageConfig();
   object.coefficient = reader.readDouble(offsets[0]);
   object.colorValue = reader.readLong(offsets[1]);
+  object.iconCodePoint = reader.readLongOrNull(offsets[2]);
   object.id = id;
-  object.isEnabled = reader.readBool(offsets[2]);
-  object.name = reader.readString(offsets[3]);
-  object.type = reader.readString(offsets[4]);
-  object.updatedAt = reader.readDateTime(offsets[5]);
+  object.isEnabled = reader.readBool(offsets[3]);
+  object.name = reader.readString(offsets[4]);
+  object.presetSizes = reader.readLongList(offsets[5]);
+  object.type = reader.readString(offsets[6]);
+  object.updatedAt = reader.readDateTime(offsets[7]);
   return object;
 }
 
@@ -130,12 +150,16 @@ P _beverageConfigDeserializeProp<P>(
     case 1:
       return (reader.readLong(offset)) as P;
     case 2:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
+      return (reader.readLongList(offset)) as P;
+    case 6:
+      return (reader.readString(offset)) as P;
+    case 7:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -460,6 +484,80 @@ extension BeverageConfigQueryFilter
     });
   }
 
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      iconCodePointIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'iconCodePoint',
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      iconCodePointIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'iconCodePoint',
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      iconCodePointEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'iconCodePoint',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      iconCodePointGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'iconCodePoint',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      iconCodePointLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'iconCodePoint',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      iconCodePointBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'iconCodePoint',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -658,6 +756,169 @@ extension BeverageConfigQueryFilter
         property: r'name',
         value: '',
       ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'presetSizes',
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'presetSizes',
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'presetSizes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'presetSizes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'presetSizes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'presetSizes',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'presetSizes',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'presetSizes',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'presetSizes',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'presetSizes',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'presetSizes',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterFilterCondition>
+      presetSizesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'presetSizes',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -890,6 +1151,20 @@ extension BeverageConfigQuerySortBy
     });
   }
 
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterSortBy>
+      sortByIconCodePoint() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.asc);
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterSortBy>
+      sortByIconCodePointDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.desc);
+    });
+  }
+
   QueryBuilder<BeverageConfig, BeverageConfig, QAfterSortBy> sortByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isEnabled', Sort.asc);
@@ -968,6 +1243,20 @@ extension BeverageConfigQuerySortThenBy
       thenByColorValueDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'colorValue', Sort.desc);
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterSortBy>
+      thenByIconCodePoint() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.asc);
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QAfterSortBy>
+      thenByIconCodePointDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.desc);
     });
   }
 
@@ -1051,6 +1340,13 @@ extension BeverageConfigQueryWhereDistinct
   }
 
   QueryBuilder<BeverageConfig, BeverageConfig, QDistinct>
+      distinctByIconCodePoint() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'iconCodePoint');
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QDistinct>
       distinctByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isEnabled');
@@ -1061,6 +1357,13 @@ extension BeverageConfigQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<BeverageConfig, BeverageConfig, QDistinct>
+      distinctByPresetSizes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'presetSizes');
     });
   }
 
@@ -1099,6 +1402,12 @@ extension BeverageConfigQueryProperty
     });
   }
 
+  QueryBuilder<BeverageConfig, int?, QQueryOperations> iconCodePointProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'iconCodePoint');
+    });
+  }
+
   QueryBuilder<BeverageConfig, bool, QQueryOperations> isEnabledProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isEnabled');
@@ -1108,6 +1417,13 @@ extension BeverageConfigQueryProperty
   QueryBuilder<BeverageConfig, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<BeverageConfig, List<int>?, QQueryOperations>
+      presetSizesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'presetSizes');
     });
   }
 
