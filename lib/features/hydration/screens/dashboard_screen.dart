@@ -27,21 +27,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => BeverageSelectionSheet(
-        onSelected: (type, coeff) {
+        onSelected: (type, coeff, presetSizes) {
           Navigator.pop(context); // Close beverage sheet
-          _showSizeSelector(context, type, coeff);
+          _showSizeSelector(context, type, coeff, presetSizes);
         },
       ),
     );
   }
 
-  void _showSizeSelector(BuildContext context, String type, double coeff) {
+  void _showSizeSelector(
+      BuildContext context, String type, double coeff, List<int>? presetSizes) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => SizeSelectionSheet(
         beverageType: type,
+        presetSizes: presetSizes,
         onConfirmed: (amount) {
           Navigator.pop(context); // Close size sheet
           _addLog(ref, amount, type, coeff);

@@ -22,8 +22,18 @@ const HydrationLogSchema = CollectionSchema(
       name: r'amountMl',
       type: IsarType.long,
     ),
-    r'timestamp': PropertySchema(
+    r'beverageType': PropertySchema(
       id: 1,
+      name: r'beverageType',
+      type: IsarType.string,
+    ),
+    r'effectiveAmountMl': PropertySchema(
+      id: 2,
+      name: r'effectiveAmountMl',
+      type: IsarType.long,
+    ),
+    r'timestamp': PropertySchema(
+      id: 3,
       name: r'timestamp',
       type: IsarType.dateTime,
     )
@@ -62,6 +72,12 @@ int _hydrationLogEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.beverageType;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -72,7 +88,9 @@ void _hydrationLogSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.amountMl);
-  writer.writeDateTime(offsets[1], object.timestamp);
+  writer.writeString(offsets[1], object.beverageType);
+  writer.writeLong(offsets[2], object.effectiveAmountMl);
+  writer.writeDateTime(offsets[3], object.timestamp);
 }
 
 HydrationLog _hydrationLogDeserialize(
@@ -83,8 +101,10 @@ HydrationLog _hydrationLogDeserialize(
 ) {
   final object = HydrationLog();
   object.amountMl = reader.readLong(offsets[0]);
+  object.beverageType = reader.readStringOrNull(offsets[1]);
+  object.effectiveAmountMl = reader.readLongOrNull(offsets[2]);
   object.id = id;
-  object.timestamp = reader.readDateTime(offsets[1]);
+  object.timestamp = reader.readDateTime(offsets[3]);
   return object;
 }
 
@@ -98,6 +118,10 @@ P _hydrationLogDeserializeProp<P>(
     case 0:
       return (reader.readLong(offset)) as P;
     case 1:
+      return (reader.readStringOrNull(offset)) as P;
+    case 2:
+      return (reader.readLongOrNull(offset)) as P;
+    case 3:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -353,6 +377,234 @@ extension HydrationLogQueryFilter
     });
   }
 
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'beverageType',
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'beverageType',
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'beverageType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'beverageType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'beverageType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'beverageType',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'beverageType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'beverageType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'beverageType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'beverageType',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'beverageType',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      beverageTypeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'beverageType',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      effectiveAmountMlIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'effectiveAmountMl',
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      effectiveAmountMlIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'effectiveAmountMl',
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      effectiveAmountMlEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'effectiveAmountMl',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      effectiveAmountMlGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'effectiveAmountMl',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      effectiveAmountMlLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'effectiveAmountMl',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition>
+      effectiveAmountMlBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'effectiveAmountMl',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<HydrationLog, HydrationLog, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -483,6 +735,33 @@ extension HydrationLogQuerySortBy
     });
   }
 
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy> sortByBeverageType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'beverageType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy>
+      sortByBeverageTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'beverageType', Sort.desc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy>
+      sortByEffectiveAmountMl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'effectiveAmountMl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy>
+      sortByEffectiveAmountMlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'effectiveAmountMl', Sort.desc);
+    });
+  }
+
   QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy> sortByTimestamp() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'timestamp', Sort.asc);
@@ -507,6 +786,33 @@ extension HydrationLogQuerySortThenBy
   QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy> thenByAmountMlDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amountMl', Sort.desc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy> thenByBeverageType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'beverageType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy>
+      thenByBeverageTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'beverageType', Sort.desc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy>
+      thenByEffectiveAmountMl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'effectiveAmountMl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QAfterSortBy>
+      thenByEffectiveAmountMlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'effectiveAmountMl', Sort.desc);
     });
   }
 
@@ -543,6 +849,20 @@ extension HydrationLogQueryWhereDistinct
     });
   }
 
+  QueryBuilder<HydrationLog, HydrationLog, QDistinct> distinctByBeverageType(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'beverageType', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<HydrationLog, HydrationLog, QDistinct>
+      distinctByEffectiveAmountMl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'effectiveAmountMl');
+    });
+  }
+
   QueryBuilder<HydrationLog, HydrationLog, QDistinct> distinctByTimestamp() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'timestamp');
@@ -561,6 +881,19 @@ extension HydrationLogQueryProperty
   QueryBuilder<HydrationLog, int, QQueryOperations> amountMlProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'amountMl');
+    });
+  }
+
+  QueryBuilder<HydrationLog, String?, QQueryOperations> beverageTypeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'beverageType');
+    });
+  }
+
+  QueryBuilder<HydrationLog, int?, QQueryOperations>
+      effectiveAmountMlProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'effectiveAmountMl');
     });
   }
 

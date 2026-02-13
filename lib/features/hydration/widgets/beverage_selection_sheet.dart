@@ -1,31 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:agua/features/hydration/providers/beverage_providers.dart';
 
-class BeverageSelectionSheet extends StatelessWidget {
-  final Function(String type, double coefficient) onSelected;
+class BeverageSelectionSheet extends ConsumerWidget {
+  final Function(String type, double coefficient, List<int>? presetSizes)
+      onSelected;
 
   const BeverageSelectionSheet({super.key, required this.onSelected});
 
   @override
-  Widget build(BuildContext context) {
-    // Define beverages and coefficients
-    final beverages = [
-      {'id': 'water', 'name': 'Agua', 'coeff': 1.0, 'icon': Icons.water_drop},
-      {'id': 'coffee', 'name': 'Café', 'coeff': 0.8, 'icon': Icons.coffee},
-      {
-        'id': 'tea',
-        'name': 'Té',
-        'coeff': 0.9,
-        'icon': Icons.emoji_food_beverage
-      },
-      {'id': 'juice', 'name': 'Jugo', 'coeff': 0.95, 'icon': Icons.local_drink},
-      {
-        'id': 'soda',
-        'name': 'Refresco',
-        'coeff': 0.85,
-        'icon': Icons.fastfood
-      }, // Icon might vary
-      {'id': 'smoothie', 'name': 'Batido', 'coeff': 0.7, 'icon': Icons.blender},
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final beveragesAsync = ref.watch(activeBeveragesProvider);
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -45,33 +30,61 @@ class BeverageSelectionSheet extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.85,
+          beveragesAsync.when(
+            data: (beverages) => GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: beverages.length,
+              itemBuilder: (context, index) {
+                final beverage = beverages[index];
+                return _BeverageCard(
+                  name: beverage.name,
+                  icon: beverage.iconCodePoint != null
+                      ? IconData(beverage.iconCodePoint!,
+                          fontFamily: 'MaterialIcons')
+                      : _getIconForType(beverage.type),
+                  coeff: beverage.coefficient,
+                  colorValue: beverage.colorValue,
+                  onTap: () => onSelected(
+                    beverage.type,
+                    beverage.coefficient,
+                    beverage.presetSizes,
+                  ),
+                );
+              },
             ),
-            itemCount: beverages.length,
-            itemBuilder: (context, index) {
-              final beverage = beverages[index];
-              return _BeverageCard(
-                name: beverage['name'] as String,
-                icon: beverage['icon'] as IconData,
-                coeff: beverage['coeff'] as double,
-                onTap: () => onSelected(
-                  beverage['id'] as String,
-                  beverage['coeff'] as double,
-                ),
-              );
-            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Error: $err')),
           ),
           const SizedBox(height: 16),
         ],
       ),
     );
+  }
+
+  IconData _getIconForType(String type) {
+    switch (type) {
+      case 'water':
+        return Icons.water_drop;
+      case 'coffee':
+        return Icons.coffee;
+      case 'tea':
+        return Icons.emoji_food_beverage;
+      case 'juice':
+        return Icons.local_drink;
+      case 'soda':
+        return Icons.fastfood;
+      case 'smoothie':
+        return Icons.blender;
+      default:
+        return Icons.local_cafe;
+    }
   }
 }
 
@@ -79,19 +92,22 @@ class _BeverageCard extends StatelessWidget {
   final String name;
   final IconData icon;
   final double coeff;
+  final int colorValue;
   final VoidCallback onTap;
 
   const _BeverageCard({
     required this.name,
     required this.icon,
     required this.coeff,
+    required this.colorValue,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final color = Color(colorValue);
     return Material(
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+      color: color.withOpacity(0.2),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -99,7 +115,7 @@ class _BeverageCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
+            Icon(icon, size: 32, color: color),
             const SizedBox(height: 8),
             Text(
               name,
@@ -107,7 +123,7 @@ class _BeverageCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '${(coeff * 100).toInt()}% hidratación',
+              '${(coeff * 100).toInt()}%',
               style: TextStyle(
                 fontSize: 10,
                 color: Theme.of(context).textTheme.bodySmall?.color,

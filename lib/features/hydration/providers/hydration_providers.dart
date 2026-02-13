@@ -75,6 +75,25 @@ final todayLogsProvider = StreamProvider<List<HydrationLog>>((ref) async* {
       .watch(fireImmediately: true);
 });
 
+final weeklyLogsProvider = FutureProvider<List<HydrationLog>>((ref) async {
+  final isar = await ref.watch(isarProvider.future);
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final sevenDaysAgo = today.subtract(const Duration(days: 6));
+  final endOfRange = today.add(const Duration(days: 1));
+
+  final logs = await isar.hydrationLogs
+      .filter()
+      .timestampBetween(sevenDaysAgo, endOfRange)
+      .findAll();
+  print('DEBUG: weeklyLogsProvider found ${logs.length} logs');
+  for (var log in logs) {
+    print(
+        'DEBUG: Log: ${log.amountMl}ml, Type: ${log.beverageType}, Time: ${log.timestamp}');
+  }
+  return logs;
+});
+
 final todayTotalIntakeProvider = Provider<double>((ref) {
   final logsAsync = ref.watch(todayLogsProvider);
   return logsAsync.when(

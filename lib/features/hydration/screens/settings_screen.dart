@@ -4,6 +4,7 @@ import 'package:agua/core/models/user_profile.dart';
 import 'package:agua/features/hydration/providers/hydration_providers.dart';
 import 'package:agua/features/hydration/services/hydration_calculator_service.dart';
 import 'package:agua/features/hydration/screens/edit_profile_screen.dart';
+import 'package:agua/features/hydration/screens/beverage_management_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -138,6 +139,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             MaterialPageRoute(
                               builder: (context) =>
                                   EditProfileScreen(profile: profile),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSectionHeader('Hidratación'),
+                    Card(
+                      child: ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.local_drink_rounded,
+                              color: Colors.blue),
+                        ),
+                        title: const Text('Gestionar Bebidas'),
+                        subtitle: const Text('Coeficientes y visibilidad'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const BeverageManagementScreen(),
                             ),
                           );
                         },

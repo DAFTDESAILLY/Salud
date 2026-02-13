@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 class SizeSelectionSheet extends StatefulWidget {
   final String beverageType;
+  final List<int>? presetSizes;
   final Function(int amount) onConfirmed;
 
   const SizeSelectionSheet({
     super.key,
     required this.beverageType,
+    this.presetSizes,
     required this.onConfirmed,
   });
 
@@ -52,12 +54,24 @@ class _SizeSelectionSheetState extends State<SizeSelectionSheet> {
                 onPressed: () => Navigator.pop(context), // Go back to beverages
               ),
               Expanded(
-                child: Text(
-                  'Elige el tamaño',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                  textAlign: TextAlign.center,
+                child: Column(
+                  children: [
+                    Text(
+                      'Elige el tamaño',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.beverageType.toUpperCase(),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            letterSpacing: 1.2,
+                          ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 48), // Balance back button
@@ -65,28 +79,50 @@ class _SizeSelectionSheetState extends State<SizeSelectionSheet> {
           ),
           const SizedBox(height: 24),
           if (!_isCustom) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _SizeOption(
-                  amount: 250,
-                  label: 'Pequeño',
-                  icon: Icons.local_cafe_outlined, // Cup
-                  onTap: () => _confirm(250),
+            Center(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: (widget.presetSizes != null &&
+                          widget.presetSizes!.isNotEmpty)
+                      ? widget.presetSizes!.map((size) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: _SizeOption(
+                              amount: size,
+                              label: '$size ml',
+                              icon: Icons.local_drink_outlined,
+                              onTap: () => _confirm(size),
+                            ),
+                          );
+                        }).toList()
+                      : [
+                          _SizeOption(
+                            amount: 250,
+                            label: 'Pequeño',
+                            icon: Icons.local_cafe_outlined,
+                            onTap: () => _confirm(250),
+                          ),
+                          const SizedBox(width: 24),
+                          _SizeOption(
+                            amount: 350,
+                            label: 'Mediano',
+                            icon: Icons.local_drink_outlined,
+                            onTap: () => _confirm(350),
+                          ),
+                          const SizedBox(width: 24),
+                          _SizeOption(
+                            amount: 500,
+                            label: 'Grande',
+                            icon: Icons.local_bar_outlined,
+                            onTap: () => _confirm(500),
+                          ),
+                        ],
                 ),
-                _SizeOption(
-                  amount: 350,
-                  label: 'Mediano',
-                  icon: Icons.local_drink_outlined, // Glass
-                  onTap: () => _confirm(350),
-                ),
-                _SizeOption(
-                  amount: 500,
-                  label: 'Grande',
-                  icon: Icons.local_bar_outlined, // Pint/Bottle
-                  onTap: () => _confirm(500),
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: 24),
             OutlinedButton(
