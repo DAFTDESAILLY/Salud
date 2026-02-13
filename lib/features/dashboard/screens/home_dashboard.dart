@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:agua/core/navigation/bottom_nav_bar.dart';
 import 'package:agua/features/hydration/screens/dashboard_screen.dart';
+import 'package:agua/features/hydration/screens/settings_screen.dart';
 
 class HomeDashboard extends ConsumerWidget {
   const HomeDashboard({super.key});
@@ -16,7 +17,7 @@ class HomeDashboard extends ConsumerWidget {
       const DashboardScreen(),
       const Center(child: Text('Módulo Fitness')),
       const Center(child: Text('Módulo Nutrición')),
-      const Center(child: Text('Ajustes')),
+      const SettingsScreen(),
     ];
 
     return Scaffold(
