@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:agua/core/database/isar_service.dart';
-import 'package:agua/core/auth/providers/auth_providers.dart';
-import 'package:agua/core/auth/screens/onboarding_screen.dart';
-import 'package:agua/features/dashboard/screens/home_dashboard.dart';
-import 'package:agua/core/theme/app_theme.dart';
+import 'package:daftfits/core/database/isar_service.dart';
+import 'package:daftfits/core/auth/providers/auth_providers.dart';
+import 'package:daftfits/core/auth/screens/onboarding_screen.dart';
+import 'package:daftfits/features/dashboard/screens/home_dashboard.dart';
+import 'package:daftfits/core/theme/app_theme.dart';
 // Note: NotificationService and hydration providers might need update later,
 // keeping them if they resolve, otherwise might comment out until migrated.
 // Actually notification service is in hydration/services/ usually?
-// The file view showed: import 'package:agua/features/notifications/services/notification_service.dart';
+// The file view showed: import 'package:daftfits/features/notifications/services/notification_service.dart';
 // If that file wasn't moved, it's fine.
-import 'package:agua/features/notifications/services/notification_service.dart';
-// import 'package:agua/features/hydration/providers/hydration_providers.dart'; // Likely conflicting or needs move.
+import 'package:daftfits/features/notifications/services/notification_service.dart';
+// import 'package:daftfits/features/hydration/providers/hydration_providers.dart'; // Likely conflicting or needs move.
 // We will comment out hydration specific imports until Phase 2 or if we need them for logic.
 
 void main() async {

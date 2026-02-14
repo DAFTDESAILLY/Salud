@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/auth/models/user_profile.dart';
-import 'package:agua/features/hydration/providers/hydration_providers.dart';
-import 'package:agua/features/hydration/services/hydration_calculator_service.dart';
-import 'package:agua/features/hydration/models/daily_hydration_goal.dart';
+import 'package:daftfits/core/auth/models/user_profile.dart';
+import 'package:daftfits/features/hydration/providers/hydration_providers.dart';
+import 'package:daftfits/features/hydration/services/hydration_calculator_service.dart';
+import 'package:daftfits/features/hydration/models/daily_hydration_goal.dart';
 import 'package:isar/isar.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -31,7 +31,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     _name = widget.profile.name;
     _age = widget.profile.age;
-    _sex = widget.profile.sex;
+
+    // Safety check for sex dropdown value
+    const validSexValues = ['male', 'female'];
+    if (validSexValues.contains(widget.profile.sex)) {
+      _sex = widget.profile.sex;
+    } else {
+      _sex = 'male'; // Default fallback
+    }
+
     _weight = widget.profile.weight;
     _activityLevel = widget.profile.activityLevel;
     _exerciseHours = widget.profile.exerciseHours;

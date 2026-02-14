@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/theme/app_colors.dart';
-import 'package:agua/core/auth/models/user_profile.dart';
-import 'package:agua/core/auth/providers/auth_providers.dart'; // Import this!
+import 'package:daftfits/core/theme/app_colors.dart';
+import 'package:daftfits/core/auth/models/user_profile.dart';
+import 'package:daftfits/core/auth/providers/auth_providers.dart'; // Import this!
 
 // Simple provider to manage local state of onboarding if needed,
 // or just use Stateful widget. Stateful is fine here.

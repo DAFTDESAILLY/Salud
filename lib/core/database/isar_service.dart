@@ -1,8 +1,8 @@
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:agua/features/hydration/models/hydration_log.dart';
-import 'package:agua/features/hydration/models/daily_hydration_goal.dart';
-import 'package:agua/features/hydration/models/beverage_config.dart';
+import 'package:daftfits/features/hydration/models/hydration_log.dart';
+import 'package:daftfits/features/hydration/models/daily_hydration_goal.dart';
+import 'package:daftfits/features/hydration/models/beverage_config.dart';
 import '../auth/models/user_profile.dart';
 
 class IsarService {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/features/hydration/providers/beverage_providers.dart';
+import 'package:daftfits/features/hydration/providers/beverage_providers.dart';
 
 class BeverageSelectionSheet extends ConsumerWidget {
   final Function(String type, double coefficient, List<int>? presetSizes)

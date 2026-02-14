@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/features/hydration/models/beverage_config.dart';
-import 'package:agua/features/hydration/providers/hydration_providers.dart';
-import 'package:agua/features/hydration/providers/beverage_providers.dart';
-import 'package:agua/features/hydration/screens/add_beverage_screen.dart';
+import 'package:daftfits/features/hydration/models/beverage_config.dart';
+import 'package:daftfits/features/hydration/providers/hydration_providers.dart';
+import 'package:daftfits/features/hydration/providers/beverage_providers.dart';
+import 'package:daftfits/features/hydration/screens/add_beverage_screen.dart';
 
 class BeverageManagementScreen extends ConsumerWidget {
   const BeverageManagementScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/theme/app_colors.dart';
+import 'package:daftfits/core/theme/app_colors.dart';
 
 final navigationIndexProvider = StateProvider<int>((ref) => 0);
 

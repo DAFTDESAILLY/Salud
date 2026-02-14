@@ -1,4 +1,4 @@
-import 'package:agua/core/auth/models/user_profile.dart';
+import 'package:daftfits/core/auth/models/user_profile.dart';
 
 class HydrationCalculatorService {
   static const int _baseCreatineMl = 300;

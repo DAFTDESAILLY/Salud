@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/auth/models/user_profile.dart';
-import 'package:agua/features/hydration/providers/hydration_providers.dart';
-import 'package:agua/features/hydration/services/hydration_calculator_service.dart';
-import 'package:agua/features/hydration/screens/edit_profile_screen.dart';
-import 'package:agua/features/hydration/screens/beverage_management_screen.dart';
+import 'package:daftfits/core/auth/models/user_profile.dart';
+import 'package:daftfits/features/hydration/providers/hydration_providers.dart';
+import 'package:daftfits/features/hydration/services/hydration_calculator_service.dart';
+import 'package:daftfits/features/hydration/screens/edit_profile_screen.dart';
+import 'package:daftfits/features/hydration/screens/beverage_management_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});

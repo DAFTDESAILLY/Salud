@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:agua/features/hydration/models/daily_history_data.dart';
+import 'package:daftfits/features/hydration/models/daily_history_data.dart';
 
 class WeeklyBarChart extends StatelessWidget {
   final List<DailyHistoryData> history; // Expects last 7 days

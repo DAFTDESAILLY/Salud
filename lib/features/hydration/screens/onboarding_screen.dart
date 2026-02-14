@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/theme/responsive_utils.dart';
+import 'package:daftfits/core/theme/responsive_utils.dart';
 
-import 'package:agua/core/auth/models/user_profile.dart';
+import 'package:daftfits/core/auth/models/user_profile.dart';
 import '../services/hydration_calculator_service.dart';
 import '../providers/hydration_providers.dart';
 import '../models/daily_hydration_goal.dart';

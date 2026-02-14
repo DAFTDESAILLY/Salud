@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/database/isar_service.dart';
-import 'package:agua/core/auth/models/user_profile.dart';
+import 'package:daftfits/core/database/isar_service.dart';
+import 'package:daftfits/core/auth/models/user_profile.dart';
 import 'package:isar/isar.dart';
 
 final isarServiceProvider = Provider<IsarService>((ref) {

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:agua/features/hydration/providers/hydration_providers.dart';
-import 'package:agua/features/hydration/models/daily_history_data.dart';
-import 'package:agua/features/hydration/widgets/weekly_bar_chart.dart';
-import 'package:agua/features/hydration/widgets/summary_metrics.dart';
-import 'package:agua/features/hydration/models/hydration_log.dart';
+import 'package:daftfits/features/hydration/providers/hydration_providers.dart';
+import 'package:daftfits/features/hydration/models/daily_history_data.dart';
+import 'package:daftfits/features/hydration/widgets/weekly_bar_chart.dart';
+import 'package:daftfits/features/hydration/widgets/summary_metrics.dart';
+import 'package:daftfits/features/hydration/models/hydration_log.dart';
+import 'package:isar/isar.dart';
 
-import 'package:agua/features/hydration/widgets/beverage_stats_view.dart';
+import 'package:daftfits/features/hydration/widgets/beverage_stats_view.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -47,18 +48,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     try {
       final isar = await ref.read(isarProvider.future);
 
-      // Get all log IDs for this day using WHERE clause with timestamp index
+      // Get all logs for this day using WHERE clause with timestamp index
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
-      // Get  IDs of logs to delete
-      final logIds = await isar.hydrationLogs
+      // Find all logs to delete
+      final logsToDelete = await isar.hydrationLogs
           .where()
           .timestampBetween(startOfDay, endOfDay)
-          .idProperty()
           .findAll();
 
-      if (logIds.isEmpty) {
+      if (logsToDelete.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -69,7 +69,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         return;
       }
 
-      // Delete all logs for this day
+      // Extract IDs and delete all logs for this day
+      final logIds = logsToDelete.map((log) => log.id).toList();
       await isar.writeTxn(() async {
         await isar.hydrationLogs.deleteAll(logIds);
       });
@@ -78,7 +79,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Se eliminaron ${logIds.length} registro(s) del ${DateFormat('d MMM', 'es').format(date)}',
+              'Se eliminaron ${logsToDelete.length} registro(s) del ${DateFormat('d MMM', 'es').format(date)}',
             ),
             backgroundColor: Colors.green,
           ),

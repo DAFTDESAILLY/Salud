@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:agua/core/theme/responsive_utils.dart'; // Import utility
-import 'package:agua/features/hydration/widgets/animated_circular_progress.dart';
-import 'package:agua/features/hydration/widgets/dashboard_widgets.dart';
-import 'package:agua/features/hydration/widgets/quick_add_capsule.dart';
-import 'package:agua/features/hydration/providers/hydration_providers.dart';
-import 'package:agua/features/hydration/services/hydration_calculator_service.dart';
-import 'package:agua/features/hydration/models/hydration_log.dart';
-import 'package:agua/features/hydration/screens/history_screen.dart';
-import 'package:agua/features/hydration/screens/settings_screen.dart';
+import 'package:daftfits/core/theme/responsive_utils.dart'; // Import utility
+import 'package:daftfits/features/hydration/widgets/animated_circular_progress.dart';
+import 'package:daftfits/features/hydration/widgets/dashboard_widgets.dart';
+import 'package:daftfits/features/hydration/widgets/quick_add_capsule.dart';
+import 'package:daftfits/features/hydration/providers/hydration_providers.dart';
+import 'package:daftfits/features/hydration/services/hydration_calculator_service.dart';
+import 'package:daftfits/features/hydration/models/hydration_log.dart';
+import 'package:daftfits/features/hydration/screens/history_screen.dart';
+import 'package:daftfits/features/hydration/screens/settings_screen.dart';
 
-import 'package:agua/features/hydration/widgets/beverage_selection_sheet.dart';
-import 'package:agua/features/hydration/widgets/size_selection_sheet.dart';
+import 'package:daftfits/features/hydration/widgets/beverage_selection_sheet.dart';
+import 'package:daftfits/features/hydration/widgets/size_selection_sheet.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
