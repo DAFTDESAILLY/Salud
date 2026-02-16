@@ -6,14 +6,7 @@ import 'package:daftfits/core/auth/providers/auth_providers.dart';
 import 'package:daftfits/core/auth/screens/onboarding_screen.dart';
 import 'package:daftfits/features/dashboard/screens/home_dashboard.dart';
 import 'package:daftfits/core/theme/app_theme.dart';
-// Note: NotificationService and hydration providers might need update later,
-// keeping them if they resolve, otherwise might comment out until migrated.
-// Actually notification service is in hydration/services/ usually?
-// The file view showed: import 'package:daftfits/features/notifications/services/notification_service.dart';
-// If that file wasn't moved, it's fine.
 import 'package:daftfits/features/notifications/services/notification_service.dart';
-// import 'package:daftfits/features/hydration/providers/hydration_providers.dart'; // Likely conflicting or needs move.
-// We will comment out hydration specific imports until Phase 2 or if we need them for logic.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +17,10 @@ void main() async {
   // Initialize Notifications
   final notificationService = NotificationService();
   await notificationService.init();
+
+  // Request notification permissions
+  print('🔔 Requesting notification permissions...');
+  await notificationService.requestPermissions();
 
   runApp(ProviderScope(
     overrides: [

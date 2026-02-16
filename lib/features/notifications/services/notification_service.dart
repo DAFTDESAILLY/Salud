@@ -36,6 +36,29 @@ class NotificationService {
     );
   }
 
+  Future<bool> requestPermissions() async {
+    // Request notification permissions for Android 13+
+    final androidImplementation =
+        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    if (androidImplementation != null) {
+      final granted =
+          await androidImplementation.requestNotificationsPermission();
+
+      // Request exact alarm permission (required for exactAllowWhileIdle)
+      final exactAlarmGranted =
+          await androidImplementation.requestExactAlarmsPermission();
+
+      print('🔔 Notification permission granted: $granted');
+      print('⏰ Exact alarm permission granted: $exactAlarmGranted');
+
+      return granted ?? false;
+    }
+
+    return true; // For other platforms, assume granted
+  }
+
   Future<void> scheduleNotification({
     required int id,
     required String title,

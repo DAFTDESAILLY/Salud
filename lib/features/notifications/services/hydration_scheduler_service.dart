@@ -10,14 +10,22 @@ class HydrationSchedulerService {
 
   Future<void> scheduleDailyReminders(
       UserProfile profile, int dailyGoalMl, int currentIntakeMl) async {
+    print('📅 [HydrationScheduler] Starting scheduleDailyReminders');
+    print('   Goal: ${dailyGoalMl}ml, Current: ${currentIntakeMl}ml');
+
     // 1. Cancel existing
     await _notificationService.cancelAllNotifications();
+    print('   ✅ Cancelled all previous notifications');
 
     // 2. Check if goal reached
-    if (currentIntakeMl >= dailyGoalMl) return;
+    if (currentIntakeMl >= dailyGoalMl) {
+      print('   🎉 Goal already reached! No reminders needed.');
+      return;
+    }
 
     // 3. Calculate intervals
     final now = DateTime.now();
+    print('   🕐 Current time: ${now.hour}:${now.minute}');
 
     // Construct BedTime for today
     DateTime bedTime = DateTime(
@@ -34,9 +42,15 @@ class HydrationSchedulerService {
     // If bedTime hour < wakeUpHour, assume it's next day.
     if (profile.bedTimeHour < profile.wakeUpHour) {
       bedTime = bedTime.add(const Duration(days: 1));
+      print('   🌙 BedTime is tomorrow: ${bedTime.hour}:${bedTime.minute}');
+    } else {
+      print('   🌙 BedTime today: ${bedTime.hour}:${bedTime.minute}');
     }
 
-    if (now.isAfter(bedTime)) return;
+    if (now.isAfter(bedTime)) {
+      print('   ⏸️ Current time is past bedtime. No reminders for today.');
+      return;
+    }
 
     // Start scheduling from later of (Now, WakeUpTime)
     DateTime startTime = DateTime(
@@ -49,6 +63,10 @@ class HydrationSchedulerService {
 
     if (now.isAfter(startTime)) {
       startTime = now;
+      print('   ⏰ Starting from current time');
+    } else {
+      print(
+          '   ⏰ Starting from wake time: ${startTime.hour}:${startTime.minute}');
     }
 
     // Schedule every hour until bedtime
@@ -73,7 +91,12 @@ class HydrationSchedulerService {
         scheduledDate: nextReminder,
       );
 
+      print(
+          '   ✅ Scheduled notification #$reminderId at ${nextReminder.hour}:${nextReminder.minute.toString().padLeft(2, '0')}');
+
       nextReminder = nextReminder.add(const Duration(hours: 1));
     }
+
+    print('   📊 Total notifications scheduled: $reminderId');
   }
 }
